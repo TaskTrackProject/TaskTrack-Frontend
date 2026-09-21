@@ -1,0 +1,179 @@
+<div class="page-header">
+
+  <div>
+    <h1>Department Management</h1>
+    <p>Create, update and delete departments.</p>
+  </div>
+
+  <button
+    nz-button
+    nzType="primary"
+    (click)="openCreate()">
+
+    <span nz-icon nzType="plus"></span>
+
+    Create Department
+
+  </button>
+
+</div>
+
+
+<div class="toolbar">
+
+  <input
+    nz-input
+    placeholder="Search department..."
+    [(ngModel)]="searchName"
+    (keyup.enter)="search()" />
+
+  <button
+    nz-button
+    (click)="search()">
+
+    <span nz-icon nzType="search"></span>
+
+    Search
+
+  </button>
+
+</div>
+
+
+<nz-table
+  #table
+  [nzData]="departments"
+  [nzLoading]="loading"
+  nzBordered>
+
+  <thead>
+
+    <tr>
+
+      <th>ID</th>
+
+      <th>Name</th>
+
+      <th>Description</th>
+
+      <th>Actions</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    @for (
+      department of table.data;
+      track department.departmentID
+    ) {
+
+      <tr>
+
+        <td>
+          {{ department.departmentID }}
+        </td>
+
+        <td>
+          {{ department.departmentName }}
+        </td>
+
+        <td>
+          {{
+            department.departmentDescription
+            || '-'
+          }}
+        </td>
+
+        <td>
+
+          <button
+            nz-button
+            nzType="link"
+            (click)="openEdit(department)">
+
+            Edit
+
+          </button>
+
+
+          <button
+            nz-button
+            nzType="link"
+            nzDanger
+            (click)="confirmDelete(department)">
+
+            Delete
+
+          </button>
+
+        </td>
+
+      </tr>
+
+    }
+
+  </tbody>
+
+</nz-table>
+
+
+<nz-modal
+  [(nzVisible)]="modalVisible"
+  [nzTitle]="
+    editingId === null
+      ? 'Create Department'
+      : 'Edit Department'
+  "
+  (nzOnCancel)="closeModal()"
+  (nzOnOk)="submit()">
+
+  <ng-container *nzModalContent>
+
+    <form
+      nz-form
+      [formGroup]="form">
+
+      <nz-form-item>
+
+        <nz-form-label
+          nzRequired>
+          Name
+        </nz-form-label>
+
+        <nz-form-control
+          nzErrorTip="Department name is required.">
+
+          <input
+            nz-input
+            formControlName="departmentName" />
+
+        </nz-form-control>
+
+      </nz-form-item>
+
+
+      <nz-form-item>
+
+        <nz-form-label>
+          Description
+        </nz-form-label>
+
+        <nz-form-control>
+
+          <textarea
+            nz-input
+            rows="4"
+            formControlName="departmentDescription">
+          </textarea>
+
+        </nz-form-control>
+
+      </nz-form-item>
+
+    </form>
+
+  </ng-container>
+
+</nz-modal>

@@ -1,0 +1,83 @@
+<div class="detail-header">
+  <button
+    nz-button
+    nzType="default"
+    routerLink="/tasks">
+    <span nz-icon nzType="arrow-left"></span>
+    Back to Tasks
+  </button>
+  <h1>Task Details</h1>
+</div>
+
+@if (loading) {
+  <div class="loading-container">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+  </div>
+}
+
+@if (errorMessage) {
+  <nz-alert
+    nzType="error"
+    [nzMessage]="errorMessage"
+    nzShowIcon
+    class="error-alert">
+  </nz-alert>
+}
+
+@if (!loading && task) {
+  <nz-card class="detail-card" [nzTitle]="task.title">
+    <div class="info-grid">
+      <nz-descriptions nzBordered [nzColumn]="2">
+        <nz-descriptions-item nzTitle="Task Title" [nzSpan]="2">
+          <strong>{{ task.title }}</strong>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Status">
+          <nz-tag [nzColor]="getStatusColor(task.status)">
+            {{ getStatusLabel(task.status) }}
+          </nz-tag>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Priority">
+          <nz-tag [nzColor]="getPriorityColor(task.priority)">
+            {{ getPriorityLabel(task.priority) }}
+          </nz-tag>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Project Name">
+          {{ task.projectName || ('Project #' + task.projectID) }}
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Due Date">
+          {{ task.dueDate ? (task.dueDate | date: 'mediumDate') : '-' }}
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Created Date">
+          {{ task.createdDate | date: 'medium' }}
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Modified Date">
+          {{ task.modifiedDate ? (task.modifiedDate | date: 'medium') : '-' }}
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Description" [nzSpan]="2">
+          <div class="description-text">
+            {{ task.description || 'No description provided.' }}
+          </div>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item nzTitle="Tags" [nzSpan]="2">
+          <div class="tags-container">
+            @for (tag of task.tags; track tag.tagID) {
+              <nz-tag [nzColor]="getTagColor(tag)">
+                {{ tag.tagName }}
+              </nz-tag>
+            } @empty {
+              <span class="no-tags">No tags</span>
+            }
+          </div>
+        </nz-descriptions-item>
+      </nz-descriptions>
+    </div>
+  </nz-card>
+}

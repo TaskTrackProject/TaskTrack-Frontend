@@ -1,0 +1,160 @@
+<div class="page-header">
+  <h1>Search Tasks</h1>
+  <p>Search and filter tasks across projects.</p>
+</div>
+
+<nz-card class="filter-card">
+  <div class="filter-grid">
+    <div>
+      <label for="search-title">Title</label>
+      <input
+        id="search-title"
+        nz-input
+        placeholder="Search by title..."
+        [(ngModel)]="title"
+        (keyup.enter)="search()" />
+    </div>
+
+    <div>
+      <label for="search-status">Status</label>
+      <nz-select
+        id="search-status"
+        [(ngModel)]="status"
+        nzPlaceHolder="All Statuses"
+        nzAllowClear
+        style="width: 100%;">
+        @for (opt of statusOptions; track opt.value) {
+          <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+        }
+      </nz-select>
+    </div>
+
+    <div>
+      <label for="search-priority">Priority</label>
+      <nz-select
+        id="search-priority"
+        [(ngModel)]="priority"
+        nzPlaceHolder="All Priorities"
+        nzAllowClear
+        style="width: 100%;">
+        @for (opt of priorityOptions; track opt.value) {
+          <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+        }
+      </nz-select>
+    </div>
+
+    <div>
+      <label for="search-project">Project</label>
+      <nz-select
+        id="search-project"
+        [(ngModel)]="projectId"
+        nzPlaceHolder="All Projects"
+        nzAllowClear
+        nzShowSearch
+        [nzLoading]="loadingProjects"
+        style="width: 100%;">
+        @for (project of projects; track project.projectID) {
+          <nz-option [nzValue]="project.projectID" [nzLabel]="project.projectName"></nz-option>
+        }
+      </nz-select>
+    </div>
+
+    <div>
+      <label for="search-tag">Tag</label>
+      <nz-select
+        id="search-tag"
+        [(ngModel)]="tagId"
+        nzPlaceHolder="All Tags"
+        nzAllowClear
+        nzShowSearch
+        [nzLoading]="loadingTags"
+        style="width: 100%;">
+        @for (tag of tags; track tag.tagID) {
+          <nz-option [nzValue]="tag.tagID" [nzLabel]="tag.tagName"></nz-option>
+        }
+      </nz-select>
+    </div>
+  </div>
+
+  <div class="filter-actions">
+    <button nz-button nzType="default" (click)="clear()">
+      <span nz-icon nzType="clear"></span>
+      Clear
+    </button>
+    <button nz-button nzType="primary" [nzLoading]="loading" (click)="search()">
+      <span nz-icon nzType="search"></span>
+      Search
+    </button>
+  </div>
+</nz-card>
+
+@if (errorMessage) {
+  <nz-alert
+    nzType="error"
+    [nzMessage]="errorMessage"
+    nzShowIcon
+    nzCloseable
+    (nzOnClose)="errorMessage = null"
+    style="margin-bottom: 24px;">
+  </nz-alert>
+}
+
+@if (!hasSearched) {
+  <nz-card class="filter-card">
+    <div class="empty-state">
+      <span nz-icon nzType="search"></span>
+      <p>Use the filters above to search for tasks.</p>
+    </div>
+  </nz-card>
+} @else {
+  <nz-card class="filter-card">
+    <nz-table
+      #resultsTable
+      [nzData]="tasks"
+      [nzLoading]="loading"
+      [nzShowPagination]="true"
+      [nzPageSize]="10">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Project</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Due Date</th>
+          <th>Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (task of resultsTable.data; track task.taskID) {
+          <tr>
+            <td>
+              <a [routerLink]="['/tasks', task.taskID]">{{ task.title }}</a>
+            </td>
+            <td>{{ task.projectName || '-' }}</td>
+            <td>
+              <nz-tag [nzColor]="getStatusColor(task.status)">
+                {{ getStatusLabel(task.status) }}
+              </nz-tag>
+            </td>
+            <td>
+              <nz-tag [nzColor]="getPriorityColor(task.priority)">
+                {{ getPriorityLabel(task.priority) }}
+              </nz-tag>
+            </td>
+            <td>
+              {{ task.dueDate ? (task.dueDate | date:'mediumDate') : '-' }}
+            </td>
+            <td>
+              @for (tag of task.tags; track tag.tagID) {
+                <nz-tag [nzColor]="tag.color || 'default'">{{ tag.tagName }}</nz-tag>
+              }
+              @if (!task.tags || task.tags.length === 0) {
+                <span>-</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
+}

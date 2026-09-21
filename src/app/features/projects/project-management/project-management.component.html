@@ -1,0 +1,143 @@
+<nz-card>
+  <div class="page-header">
+    <h2>Project Management</h2>
+    <button nz-button nzType="primary" (click)="showCreateModal()">
+      <nz-icon nzType="plus" /> Create Project
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-inputs">
+      <nz-input-group [nzSuffix]="suffixIconSearch">
+        <input type="text" nz-input placeholder="Search by name" [(ngModel)]="searchParams.name" (keyup.enter)="loadProjects()" />
+      </nz-input-group>
+      <ng-template #suffixIconSearch>
+        <nz-icon nzType="search" />
+      </ng-template>
+
+      <nz-select [(ngModel)]="searchParams.status" nzPlaceHolder="Select Status" nzAllowClear (ngModelChange)="loadProjects()">
+        @for (opt of statusOptions; track opt.value) {
+          <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+        }
+      </nz-select>
+
+      <nz-select [(ngModel)]="searchParams.departmentId" nzPlaceHolder="Select Department" nzAllowClear nzShowSearch (ngModelChange)="loadProjects()">
+        @for (dept of departments; track dept.departmentID) {
+          <nz-option [nzValue]="dept.departmentID" [nzLabel]="dept.departmentName"></nz-option>
+        }
+      </nz-select>
+
+      <button nz-button nzType="default" (click)="resetSearch()">Reset</button>
+    </div>
+  </div>
+
+  <nz-table #basicTable [nzData]="projects" [nzLoading]="isLoading" nzSize="middle" [nzShowPagination]="true">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Status</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (project of basicTable.data; track project.projectID) {
+        <tr>
+          <td>{{ project.projectID }}</td>
+          <td>
+            <a [routerLink]="['/projects', project.projectID]">{{ project.projectName }}</a>
+          </td>
+          <td>{{ project.departmentName }}</td>
+          <td>
+            <nz-tag [nzColor]="getStatusColor(project.status)">
+              {{ getStatusLabel(project.status) }}
+            </nz-tag>
+          </td>
+          <td>{{ project.startDate | date:'mediumDate' }}</td>
+          <td>{{ project.endDate ? (project.endDate | date:'mediumDate') : 'N/A' }}</td>
+          <td>
+            <nz-space>
+              <button *nzSpaceItem nz-button nzType="text" nzSize="small" (click)="showEditModal(project)">
+                <nz-icon nzType="edit" nzTheme="twotone" />
+              </button>
+              <button *nzSpaceItem nz-button nzType="text" nzSize="small" nzDanger (click)="deleteProject(project.projectID)">
+                <nz-icon nzType="delete" nzTheme="twotone" />
+              </button>
+            </nz-space>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+</nz-card>
+
+<nz-modal
+  [(nzVisible)]="isModalVisible"
+  [nzTitle]="modalTitle"
+  (nzOnCancel)="handleModalCancel()"
+  (nzOnOk)="handleModalOk()"
+  [nzOkLoading]="isSaving"
+  nzWidth="600px"
+>
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="projectName">Project Name</nz-form-label>
+        <nz-form-control [nzSm]="18" [nzXs]="24" nzErrorTip="Please input project name!">
+          <input nz-input formControlName="projectName" id="projectName" placeholder="Enter project name" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="description">Description</nz-form-label>
+        <nz-form-control [nzSm]="18" [nzXs]="24">
+          <textarea nz-input formControlName="description" id="description" rows="3" placeholder="Enter description"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="departmentID">Department</nz-form-label>
+        <nz-form-control [nzSm]="18" [nzXs]="24" nzErrorTip="Please select a department!">
+          <nz-select formControlName="departmentID" id="departmentID" nzShowSearch nzPlaceHolder="Select a department">
+            @for (dept of departments; track dept.departmentID) {
+              <nz-option [nzValue]="dept.departmentID" [nzLabel]="dept.departmentName"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label [nzSm]="24" nzRequired nzFor="startDate">Start Date</nz-form-label>
+            <nz-form-control [nzSm]="24" nzErrorTip="Please select start date!">
+              <nz-date-picker formControlName="startDate" id="startDate" style="width: 100%"></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label [nzSm]="24" nzFor="endDate">End Date</nz-form-label>
+            <nz-form-control [nzSm]="24">
+              <nz-date-picker formControlName="endDate" id="endDate" style="width: 100%"></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="status">Status</nz-form-label>
+        <nz-form-control [nzSm]="18" [nzXs]="24" nzErrorTip="Please select status!">
+          <nz-select formControlName="status" id="status">
+            @for (opt of statusOptions; track opt.value) {
+              <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+</nz-modal>

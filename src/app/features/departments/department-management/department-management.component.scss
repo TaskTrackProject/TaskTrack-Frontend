@@ -1,0 +1,47 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0 0 4px;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: #8c8c8c;
+    font-size: 14px;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+
+  margin-bottom: 20px;
+
+  input {
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+
+    input {
+      max-width: 100%;
+    }
+  }
+}

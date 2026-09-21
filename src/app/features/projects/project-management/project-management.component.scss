@@ -1,0 +1,31 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+.toolbar {
+  margin-bottom: 24px;
+  
+  .search-inputs {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    
+    nz-input-group {
+      width: 250px;
+    }
+    
+    nz-select {
+      width: 200px;
+    }
+  }
+}

@@ -1,0 +1,41 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+
+  nz-input-group {
+    width: 250px;
+  }
+
+  nz-select {
+    width: 200px;
+  }
+}
+
+.text-danger {
+  color: #ff4d4f;
+  
+  &:hover {
+    color: #ff7875;
+  }
+}
+
+.w-100 {
+  width: 100%;
+}
+
+nz-divider {
+  margin: 0 8px;
+}

@@ -1,0 +1,95 @@
+<div class="page-header">
+  <div class="header-left">
+    <button nz-button nzType="default" routerLink="/projects">
+      <nz-icon nzType="arrow-left" /> Back to Projects
+    </button>
+  </div>
+</div>
+
+<nz-spin [nzSpinning]="loadingProject">
+  @if (error) {
+    <nz-alert nzType="error" [nzMessage]="error" nzShowIcon class="mb-4"></nz-alert>
+  }
+  
+  @if (project && !error) {
+    <nz-card [nzTitle]="project.projectName" [nzExtra]="statusTag" class="mb-4">
+      <ng-template #statusTag>
+        <nz-tag [nzColor]="getProjectStatusColor(project.status)">
+          {{ getProjectStatusLabel(project.status) }}
+        </nz-tag>
+      </ng-template>
+      
+      <div class="project-info">
+        @if (project.description) {
+          <div class="info-item">
+            <span class="label">Description:</span>
+            <span class="value">{{ project.description }}</span>
+          </div>
+        }
+        
+        <div class="info-item">
+          <span class="label">Department:</span>
+          <span class="value">{{ project.departmentName || 'N/A' }}</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="label">Dates:</span>
+          <span class="value">
+            {{ project.startDate | date:'mediumDate' }} 
+            @if (project.endDate) {
+              - {{ project.endDate | date:'mediumDate' }}
+            }
+          </span>
+        </div>
+      </div>
+    </nz-card>
+  }
+</nz-spin>
+
+<h3 class="mt-4 mb-4">Project Tasks</h3>
+
+<nz-spin [nzSpinning]="loadingTasks">
+  @if (tasksError) {
+    <nz-alert nzType="error" [nzMessage]="tasksError" nzShowIcon class="mb-4"></nz-alert>
+  }
+
+  <nz-table #tasksTable [nzData]="tasks" [nzFrontPagination]="true" [nzPageSize]="10">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Due Date</th>
+        <th>Tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (task of tasksTable.data; track task.taskID) {
+        <tr>
+          <td>{{ task.taskID }}</td>
+          <td>{{ task.title }}</td>
+          <td>
+            <nz-tag [nzColor]="getTaskStatusColor(task.status)">
+              {{ getTaskStatusLabel(task.status) }}
+            </nz-tag>
+          </td>
+          <td>
+            <nz-tag [nzColor]="getTaskPriorityColor(task.priority)">
+              {{ getTaskPriorityLabel(task.priority) }}
+            </nz-tag>
+          </td>
+          <td>{{ task.dueDate ? (task.dueDate | date:'mediumDate') : 'No due date' }}</td>
+          <td>
+            @for (tag of task.tags; track tag.tagID) {
+              <nz-tag [nzColor]="tag.color || 'default'">{{ tag.tagName }}</nz-tag>
+            }
+            @if (!task.tags || task.tags.length === 0) {
+              <span class="text-gray">-</span>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+</nz-spin>
